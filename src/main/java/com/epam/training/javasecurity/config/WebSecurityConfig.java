@@ -1,19 +1,27 @@
 package com.epam.training.javasecurity.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import com.epam.training.javasecurity.mvc.LoginHandlerInterceptor;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 @Configuration
-public class WebSecurityConfig extends WebMvcConfigurerAdapter {
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginHandlerInterceptor())
-        	.addPathPatterns("/*", "/admin/*").excludePathPatterns("/login");
+	public void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth
+			.inMemoryAuthentication()
+				.withUser("peter@example.com")
+					.password("password")
+					.roles("ADMIN", "USER")
+			.and()
+				.withUser("andrew@example.com")
+					.password("password")
+					.roles("USER");
 	}
+
 	
 
 

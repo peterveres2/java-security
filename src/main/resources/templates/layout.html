@@ -1,9 +1,11 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-3.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
+	xmlns:th="http://www.thymeleaf.org" 
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">Messaging Application</title>
+
 
 <link th:href="@{/resources/css/bootstrap.css}"
 	href="../static/css/bootstrap.css" rel="stylesheet"></link>
@@ -27,20 +29,18 @@
 			<div class="navbar-inner">
 				<div class="container">
 
-					<div class="nav-collapse collapse"
-						th:with="currentUser=${session.currentUser}">
-						<div th:if="${currentUser != null}">
+					<div class="nav-collapse collapse">
+						<div sec:authorize="isAuthenticated()">
 							<form class="navbar-form pull-right" th:action="@{/logout}"
 								method="post">
 								<input type="submit" value="Log out" />
 							</form>
-							<p class="navbar-text pull-right" th:text="${currentUser.email}">
-								sample_user</p>
+							<p sec:authentication="name" class="navbar-text pull-right">Actual user</p>
 							<ul class="nav">
 								<li><a th:href="@{/}">Inbox</a></li>
 								<li><a th:href="@{/(form)}">Compose</a></li>
-								<li th:if="${currentUser?.admin}"><a th:href="@{/admin/users}">Users</a></li>
-								<li th:if="${currentUser?.admin}"><a th:href="@{/admin/h2/}">H2</a></li>
+								<li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/users}">Users</a></li>
+								<li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/h2/}">H2</a></li>
 							</ul>
 						</div>
 					</div>

@@ -4,6 +4,8 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,10 +33,19 @@ public class MessageController {
     }
 
     @RequestMapping(method=RequestMethod.GET)
-    public ModelAndView list(HttpSession session) {
-        Iterable<Message> messages = messageRepository.findAllToCurrentUser((User)session.getAttribute("currentUser"));
+    public ModelAndView list() {
+    	User user = findActualUser();
+        
+        Iterable<Message> messages = messageRepository.findAllToCurrentUser(user);
         return new ModelAndView("messages/inbox", "messages", messages);
     }
+
+	private User findActualUser() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    	String name = auth.getName(); //get logged in username
+        User user = userRepository.findByEmail(name);
+		return user;
+	}
     
 
     @RequestMapping(value = "{id}", method=RequestMethod.GET)
@@ -69,8 +80,7 @@ public class MessageController {
         message.setSummary(messageForm.getSummary());
         message.setText(messageForm.getText());
         message.setTo(to);
-        User actualUser = (User)session.getAttribute("currentUser");
-        message.setFrom(actualUser);
+        message.setFrom(findActualUser());
         message.setPriority(messageForm.getPriority());
         message = messageRepository.save(message);
         
