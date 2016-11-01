@@ -44,7 +44,7 @@ public class MessageController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     	String name = auth.getName(); //get logged in username
         User user = userRepository.findByEmail(name);
-		return user;
+		return user;	
 	}
     
 
