@@ -5,6 +5,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,7 @@ import com.epam.training.javasecurity.data.Message;
 import com.epam.training.javasecurity.data.MessageRepository;
 import com.epam.training.javasecurity.data.User;
 import com.epam.training.javasecurity.data.UserRepository;
+import com.epam.training.javasecurity.security.CustomUserDetails;
 
 @Controller
 @RequestMapping("/")
@@ -33,17 +35,15 @@ public class MessageController {
     }
 
     @RequestMapping(method=RequestMethod.GET)
-    public ModelAndView list() {
-    	User user = findActualUser();
+    public ModelAndView list(@AuthenticationPrincipal CustomUserDetails currentUser) {
+    	User user = findActualUser(currentUser);
         
         Iterable<Message> messages = messageRepository.findAllToCurrentUser(user);
         return new ModelAndView("messages/inbox", "messages", messages);
     }
 
-	private User findActualUser() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    	String name = auth.getName(); //get logged in username
-        User user = userRepository.findByEmail(name);
+	private User findActualUser(CustomUserDetails currentUser) {		
+        User user = userRepository.findByEmail(currentUser.getUsername());
 		return user;	
 	}
     
@@ -67,7 +67,8 @@ public class MessageController {
     }
 
     @RequestMapping(method=RequestMethod.POST)
-    public String create(@Valid MessageForm messageForm, BindingResult result, RedirectAttributes redirect, HttpSession session) {
+    public String create(@Valid MessageForm messageForm, BindingResult result, RedirectAttributes redirect, HttpSession session, 
+    		@AuthenticationPrincipal CustomUserDetails currentUser) {
         User to = userRepository.findByEmail(messageForm.getToEmail());
         if(to == null) {
             result.rejectValue("toEmail", "toEmail", "User not found");
@@ -80,7 +81,7 @@ public class MessageController {
         message.setSummary(messageForm.getSummary());
         message.setText(messageForm.getText());
         message.setTo(to);
-        message.setFrom(findActualUser());
+        message.setFrom(findActualUser(currentUser));
         message.setPriority(messageForm.getPriority());
         message = messageRepository.save(message);
         
