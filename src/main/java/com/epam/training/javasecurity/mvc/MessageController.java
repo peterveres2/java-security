@@ -4,9 +4,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,6 +17,7 @@ import com.epam.training.javasecurity.data.Message;
 import com.epam.training.javasecurity.data.MessageRepository;
 import com.epam.training.javasecurity.data.User;
 import com.epam.training.javasecurity.data.UserRepository;
+import com.epam.training.javasecurity.security.CurrentUser;
 import com.epam.training.javasecurity.security.CustomUserDetails;
 
 @Controller
@@ -35,7 +33,7 @@ public class MessageController {
     }
 
     @RequestMapping(method=RequestMethod.GET)
-    public ModelAndView list(@AuthenticationPrincipal CustomUserDetails currentUser) {
+    public ModelAndView list(@CurrentUser CustomUserDetails currentUser) {
     	User user = findActualUser(currentUser);
         
         Iterable<Message> messages = messageRepository.findAllToCurrentUser(user);
@@ -68,7 +66,7 @@ public class MessageController {
 
     @RequestMapping(method=RequestMethod.POST)
     public String create(@Valid MessageForm messageForm, BindingResult result, RedirectAttributes redirect, HttpSession session, 
-    		@AuthenticationPrincipal CustomUserDetails currentUser) {
+    		@CurrentUser CustomUserDetails currentUser) {
         User to = userRepository.findByEmail(messageForm.getToEmail());
         if(to == null) {
             result.rejectValue("toEmail", "toEmail", "User not found");
