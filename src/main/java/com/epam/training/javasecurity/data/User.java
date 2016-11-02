@@ -44,6 +44,7 @@ public class User implements Serializable {
     	super();
     	setEmail(user.getEmail());
     	setPassword(user.getPassword());
+    	setId(user.getId());
 	}
 
 	public String getPassword() {

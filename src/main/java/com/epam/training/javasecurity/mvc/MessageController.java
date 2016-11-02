@@ -36,7 +36,7 @@ public class MessageController {
     public ModelAndView list(@CurrentUser CustomUserDetails currentUser) {
     	User user = findActualUser(currentUser);
         
-        Iterable<Message> messages = messageRepository.findAllToCurrentUser(user);
+        Iterable<Message> messages = messageRepository.findAllToCurrentUser();
         return new ModelAndView("messages/inbox", "messages", messages);
     }
 

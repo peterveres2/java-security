@@ -43,6 +43,7 @@ dependencies {
 			"org.springframework.boot:spring-boot-starter-thymeleaf",
 			"org.springframework.security:spring-security-web",
 			"org.springframework.security:spring-security-config",			
+			"org.springframework.security:spring-security-data",	
 			"nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect",
 			"com.h2database:h2",
 			"org.thymeleaf.extras:thymeleaf-extras-springsecurity4"
